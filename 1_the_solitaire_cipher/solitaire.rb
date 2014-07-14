@@ -79,6 +79,48 @@ class Deck
 		end
 end
 
+class Encrypter
+	attr_accessor :input 
+	attr_accessor :output 
+
+	def initialize(message)
+		@input = message
+	end
+
+	def encrypt
+		keystream = generate_keystream
+		puts keystream
+		prepare_input
+
+	end
+
+	def decrypt
+	end
+
+	private
+
+		def prepare_input
+			#Discard non A to Z chars, upcase everything remaining, split into 5-character groups, 
+			#use X's to pad the last group if needed.
+			input
+		end
+
+		def generate_keystream
+			length = input.length
+			puts "Length: #{input.length}"
+			keydeck = Deck.new
+			keystream = []
+			while keystream.length < length do 
+				new_key = keydeck.get_key
+				keystream << new_key unless new_key.nil?
+			end
+			keystream
+		end
+
+
+
+
+end
 
 def generate_keystream(length)
 	keydeck = Deck.new
@@ -102,10 +144,7 @@ def to_letter(number)
 	end
 end
 
-
-mykeystream = generate_keystream(10)
-puts "Keystream: #{mykeystream}"
-
-decrypted = phrase
+decrypted = Encrypter.new("Code in Ruby, live longer!").encrypt
 puts "Phrase: #{phrase}"
 puts "Decrypted: #{decrypted}"
+
