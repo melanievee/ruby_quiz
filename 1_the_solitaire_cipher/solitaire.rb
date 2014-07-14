@@ -88,8 +88,7 @@ class Encrypter
 	end
 
 	def encrypt
-		keystream = generate_keystream
-		puts keystream
+		keystream = generate_keystream		
 		prepare_input
 
 	end
@@ -100,9 +99,8 @@ class Encrypter
 	private
 
 		def prepare_input
-			#Discard non A to Z chars, upcase everything remaining, split into 5-character groups, 
-			#use X's to pad the last group if needed.
-			input
+			input.upcase!.gsub!(/[^A-Z]/,'')
+			input.concat("X"*(input.length/5))
 		end
 
 		def generate_keystream
