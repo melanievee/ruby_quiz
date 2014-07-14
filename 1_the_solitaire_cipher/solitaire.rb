@@ -80,44 +80,47 @@ class Deck
 end
 
 class Encrypter
-	attr_accessor :input 
-	attr_accessor :output 
 
 	def initialize(message)
 		@input = message
 	end
 
 	def encrypt
-		keystream = generate_keystream		
 		prepare_input
-
+		keystream = generate_keystream		
+		input_numbers = @input.split('').collect { |letter| to_number(letter) }
+		keystream_numbers = keystream.split('').collect { |letter| to_number(letter) }
+		sum = [input_numbers, keystream_numbers].transpose.map {|v| v.reduce(:+)}
+		sum.collect { |number| to_letter(number) }.join
 	end
 
 	def decrypt
+		prepare_input
+		input_numbers = @input.split('').collect { |letter| to_number(letter) }
+		keystream = generate_keystream		
+		keystream_numbers = keystream.split('').collect { |letter| to_number(letter) }
+		difference = [input_numbers, keystream_numbers].transpose.map {|v| v.reduce(:-)}
+		difference.map! { |element| element<=0 ? element+26 : element}
+		difference.collect { |number| to_letter(number) }.join
 	end
 
 	private
 
 		def prepare_input
-			input.upcase!.gsub!(/[^A-Z]/,'')
-			input.concat("X"*(input.length/5))
+			@input = @input.upcase.gsub(/[^A-Z]/,'')		
+			add_x = (@input.length.modulo(5)).modulo(5)
+			@input.concat("X"*add_x)
 		end
 
 		def generate_keystream
-			length = input.length
-			puts "Length: #{input.length}"
 			keydeck = Deck.new
 			keystream = []
-			while keystream.length < length do 
+			while keystream.length < @input.length do 
 				new_key = keydeck.get_key
 				keystream << new_key unless new_key.nil?
 			end
-			keystream
+			keystream.join
 		end
-
-
-
-
 end
 
 def generate_keystream(length)
@@ -142,7 +145,15 @@ def to_letter(number)
 	end
 end
 
-decrypted = Encrypter.new("Code in Ruby, live longer!").encrypt
-puts "Phrase: #{phrase}"
+encrypted = Encrypter.new("CODEI NRUBY LIVEL ONGER").encrypt
+puts "Encrypted: #{encrypted}"
+decrypted = Encrypter.new(encrypted).decrypt
 puts "Decrypted: #{decrypted}"
+decrypted = Encrypter.new("CLEPK HHNIY CFPWH FDFEH").decrypt
+puts "Decrypted: #{decrypted}"
+decrypted = Encrypter.new("ABVAW LWZSY OORYK DUPVH").decrypt
+puts "Decrypted: #{decrypted}"
+
+
+
 
