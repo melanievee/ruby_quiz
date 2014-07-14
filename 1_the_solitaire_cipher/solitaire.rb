@@ -1,5 +1,3 @@
-phrase = "CLEPK HHNIY CFPWH FDFEH"
-
 class Deck
 	attr_accessor :deck
 
@@ -80,36 +78,30 @@ class Deck
 end
 
 class Encrypter
-
 	def initialize(message)
-		@input = message
+		@input = prepare_input(message)
+		@keystream = generate_keystream
+		@input_numbers = array_to_numbers(@input)
+		@keystream_numbers = array_to_numbers(@keystream)
 	end
 
 	def encrypt
-		prepare_input
-		keystream = generate_keystream		
-		input_numbers = @input.split('').collect { |letter| to_number(letter) }
-		keystream_numbers = keystream.split('').collect { |letter| to_number(letter) }
-		sum = [input_numbers, keystream_numbers].transpose.map {|v| v.reduce(:+)}
-		sum.collect { |number| to_letter(number) }.join
+		sum = [@input_numbers, @keystream_numbers].transpose.map {|v| v.reduce(:+)}
+		array_to_letters(sum).join
 	end
 
 	def decrypt
-		prepare_input
-		input_numbers = @input.split('').collect { |letter| to_number(letter) }
-		keystream = generate_keystream		
-		keystream_numbers = keystream.split('').collect { |letter| to_number(letter) }
-		difference = [input_numbers, keystream_numbers].transpose.map {|v| v.reduce(:-)}
+		difference = [@input_numbers, @keystream_numbers].transpose.map {|v| v.reduce(:-)}
 		difference.map! { |element| element<=0 ? element+26 : element}
-		difference.collect { |number| to_letter(number) }.join
+		array_to_letters(difference).join
 	end
 
 	private
 
-		def prepare_input
-			@input = @input.upcase.gsub(/[^A-Z]/,'')		
-			add_x = (@input.length.modulo(5)).modulo(5)
-			@input.concat("X"*add_x)
+		def prepare_input(message)
+			message = message.upcase.gsub(/[^A-Z]/,'')		
+			add_x = (message.length.modulo(5)).modulo(5)
+			message.concat("X"*add_x)
 		end
 
 		def generate_keystream
@@ -121,16 +113,14 @@ class Encrypter
 			end
 			keystream.join
 		end
-end
 
-def generate_keystream(length)
-	keydeck = Deck.new
-	keystream = []
-	while keystream.length < length do 
-		new_key = keydeck.get_key
-		keystream << new_key unless new_key.nil?
-	end
-	keystream
+		def array_to_numbers(array)
+			array.split('').collect { |letter| to_number(letter) }
+		end
+
+		def array_to_letters(array)
+			array.collect { |number| to_letter(number) }
+		end
 end
 
 def to_number(letter)
@@ -153,7 +143,3 @@ decrypted = Encrypter.new("CLEPK HHNIY CFPWH FDFEH").decrypt
 puts "Decrypted: #{decrypted}"
 decrypted = Encrypter.new("ABVAW LWZSY OORYK DUPVH").decrypt
 puts "Decrypted: #{decrypted}"
-
-
-
-
