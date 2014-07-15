@@ -135,11 +135,21 @@ def to_letter(number)
 	end
 end
 
-encrypted = Encrypter.new("CODEI NRUBY LIVEL ONGER").encrypt
-puts "Encrypted: #{encrypted}"
-decrypted = Encrypter.new(encrypted).decrypt
-puts "Decrypted: #{decrypted}"
-decrypted = Encrypter.new("CLEPK HHNIY CFPWH FDFEH").decrypt
-puts "Decrypted: #{decrypted}"
-decrypted = Encrypter.new("ABVAW LWZSY OORYK DUPVH").decrypt
-puts "Decrypted: #{decrypted}"
+if ARGV.size != 1
+	puts "Please provide message to be encrypted or decrypted. To run this program, please call it using the following syntax: "
+	puts "ruby solitaire.rb MESSAGE"
+else
+	puts "Your input string is: #{ARGV[0]}"
+	puts "Press 1 to encrypt, 2 to decrypt:"
+	mymethod = $stdin.gets.chomp.to_i
+
+	if mymethod == 1
+		encrypted = Encrypter.new(ARGV[0]).encrypt
+		puts "Encrypted string: #{encrypted}"
+	elsif mymethod == 2
+		decrypted = Encrypter.new(ARGV[0]).decrypt
+		puts "Decrypted string: #{decrypted}"
+	else
+		puts "That input was not recognized"
+	end
+end
