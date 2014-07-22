@@ -19,17 +19,51 @@
 # Output:
 # Email the person and tell them who their person is
 
+require 'net/smtp'
+
+def send_email(to,opts={})
+  opts[:server]      ||= 'smtp.gmail.com'
+  opts[:from]        ||= ENV['GMAIL_USERNAME']
+  opts[:from_alias]  ||= 'Santa Claus'
+  opts[:subject]     ||= "Your Secret Santa has been picked!"
+  opts[:santa]       ||= "Error!  Contact Melanie!"
+  opts[:port]				 ||= 587
+  opts[:domain]			 ||= "gmail.com"
+  opts[:password]		 ||= ENV['GMAIL_PASSWORD']
+
+  msg = <<END_OF_MESSAGE
+From: #{opts[:from_alias]} <#{opts[:from]}>
+To: <#{to}>
+Subject: #{opts[:subject]}
+
+Dear #{opts[:recipient]},
+
+Secret Santas have been selected!  
+
+You drew #{opts[:santa]}.  
+
+Happy Gifting!
+Melanie
+END_OF_MESSAGE
+
+	smtp = Net::SMTP.new opts[:server], opts[:port]
+	smtp.enable_starttls
+	smtp.start(opts[:domain], opts[:from], opts[:password], :login) do
+	  smtp.send_message msg, opts[:from], to
+	end
+end
+
 class Person
 	attr_accessor :firstname, :lastname, :email, :giftee
 
 	def initialize(firstname, lastname, email)
 		@firstname = firstname
 		@lastname = lastname
-		@email = email 
+		@email = email.gsub!("<","").gsub!(">","")
 	end
 
-	def info
-		firstname + " " + lastname + " " + email
+	def fullname
+		firstname + " " + lastname
 	end
 
 	def assign_giftee(person)
@@ -50,7 +84,7 @@ def assign_santas(people)
 	puts "PAIRS: "
 	people.each_with_index do |person, i| 
 		person.assign_giftee(giftees[i])
-		puts "#{person.info} drew #{giftees[i].info}"
+		puts "#{person.fullname} drew #{giftees[i].fullname}"
 	end
 end
 
@@ -81,3 +115,8 @@ begin
 	assign_santas(people)
 	iter +=1
 end until check_santas(people)
+
+people.each do |person|
+	send_email person.email, :santa => person.giftee.fullname, :recipient => person.firstname
+end
+
