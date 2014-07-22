@@ -81,7 +81,7 @@ end
 
 def assign_santas(people)
 	giftees = people.shuffle
-	puts "PAIRS: "
+	# puts "PAIRS: "
 	people.each_with_index do |person, i| 
 		person.assign_giftee(giftees[i])
 		# puts "#{person.fullname} drew #{giftees[i].fullname}"
@@ -96,7 +96,9 @@ def check_santas(people)
 	valid
 end
 
-puts "\n\nWelcome to Secret Santa!  Please input names in the following format: \nFIRST_NAME space FAMILY_NAME space <EMAIL_ADDRESS>, pressing return after each.  \nType q and hit enter to quit."
+puts "\n\nWelcome to Secret Santa!  Please input names in the following format:"
+puts "FIRST_NAME space FAMILY_NAME space <EMAIL_ADDRESS>, pressing return after each."
+puts "Type q and hit enter to quit."
 
 people = []
 while true
@@ -109,14 +111,18 @@ while true
 	end
 end
 
-iter = 1
+iter = 0
 begin
-	puts "Iteration number #{iter}"
 	assign_santas(people)
 	iter +=1
 end until check_santas(people)
 
+puts "\n\n\nWoo hoo!  Santas have been assigned.  It took #{iter} iterations to find a winning combination."
+puts "\n\n\nEmailing entrants..."
+
 people.each do |person|
 	send_email person.email, :santa => person.giftee.fullname, :recipient => person.firstname
 end
+
+puts "\n\n\nEmailing complete.  Happy gifting!\n\n\n"
 
