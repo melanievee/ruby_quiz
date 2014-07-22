@@ -84,7 +84,7 @@ def assign_santas(people)
 	puts "PAIRS: "
 	people.each_with_index do |person, i| 
 		person.assign_giftee(giftees[i])
-		puts "#{person.fullname} drew #{giftees[i].fullname}"
+		# puts "#{person.fullname} drew #{giftees[i].fullname}"
 	end
 end
 
