@@ -5,7 +5,6 @@
 
 def Regexp.build( *args )
 	args.map! { |x| Array(x) }
-	# Regexp.union(args)
 	regex = "^(" + args.join('|') + ")"
 	Regexp.new regex
 end
