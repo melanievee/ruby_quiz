@@ -4,11 +4,16 @@
 # of passed arguments.
 
 def Regexp.build( *args )
-	args.map! { |x| Array(x) }
-	regex = "^(" + args.join('|') + ")"
+	args.map!{ |x| Array(x) }.flatten!
+	regex = ""
+	args.each do |arg|
+		regex.concat("^")
+		regex.concat("[-]") if arg < 0
+		regex.concat("(#{arg.abs}$)|")
+	end
+	regex.chop!
 	Regexp.new regex
 end
-
 
 lucky = Regexp.build( 3, 7 )
 puts "lucky: #{lucky}"
@@ -35,7 +40,13 @@ puts "Result of 04: #{!("04" =~ year).nil?}"
 puts "Result of 2004: #{!("2004" =~ year).nil?}"
 puts "Result of 99: #{!("99" =~ year).nil?}"
 
-num = Regexp.build( 0..1_000_000 )
+negs = Regexp.build( -10..-1)
+puts "negs: #{negs}"
+puts "Result of -20: #{!("-20" =~ negs).nil?}"
+puts "Result of -5: #{!("-5" =~ negs).nil?}"
+puts "Result of 5: #{!("5" =~ negs).nil?}"
+
+# num = Regexp.build( 0..1_000_000 )
 # puts "num: #{num}"
-puts "Result of -1: #{!("-1" =~ num).nil?}"
-puts "Result of 1000: #{!("1000" =~ num).nil?}"
+# puts "Result of -1: #{!("-1" =~ num).nil?}"
+# puts "Result of 1000: #{!("1000" =~ num).nil?}"
