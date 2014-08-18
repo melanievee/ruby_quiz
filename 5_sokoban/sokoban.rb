@@ -1,11 +1,3 @@
-# 1. Start Sokoban
-# 2. Ask user which level
-# 3. Print level MAP
-# 4. Start game
-# 5. User specifies moves, map prints after each move 
-# 6. Game detects whether a move is possible, then completes the move.
-# 7. Game over when all storage units are in their spots
-
 class Sokoban
 
 	def initialize
@@ -17,8 +9,12 @@ class Sokoban
 	def load_level
 		puts "Loading Sokoban level #{@level}."
 		lines = File.readlines('sokoban_levels.txt')
-    lines = lines.map {|line| line.chomp.ljust(19)}.join("\n")
-    levels = lines.split(/\n {19}\n/)
+		maxlength = 0
+		lines.each do |line|
+			maxlength = [line.length, maxlength].max 
+		end
+    lines = lines.map {|line| line.chomp.ljust(maxlength-1)}.join("\n")
+    levels = lines.split(/\n {#{maxlength-1}}\n/)
     levels[@level-1].split("\n")
 	end
 
@@ -61,7 +57,6 @@ class Sokoban
 	def move_player(move)
 		player_row, player_col = find_player
 		delta_row, delta_col = define_deltas(move)
-
 		p_dest_icon = find_icon(player_row+delta_row,player_col+delta_col)
 		p_icon = find_icon(player_row, player_col)
 
